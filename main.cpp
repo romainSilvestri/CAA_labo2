@@ -2,6 +2,7 @@
 #include <fstream>
 #include <sodium.h>
 #include <cstring>
+#include <limits>
 #include "base64.h"
 
 #define PASSWORD_SIZE 1024
@@ -129,6 +130,8 @@ int main() {
             string siteName;
             string delimiter = " ---- ";
 
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
             cout << "Please enter the command (lock, change, store or recover): " << endl;
 
             cin >> command; // todo: regarder pour mettre des fgets(variable, taille, stdin)
@@ -151,6 +154,8 @@ int main() {
                     break;
                 }
 
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
                 cout << "Enter the new master password of, at most," << PASSWORD_SIZE << " char:" << endl;
                 cin >> newPwd;
 
@@ -245,8 +250,13 @@ int main() {
             if(command == "store"){
                 file.open(FILEPATH, ios::app);
 
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
                 cout << "Please enter the site name: " << endl;
                 cin >> siteName;
+
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
                 cout << "Please enter the password (min: 6 char): "  << endl;
 
                 unsigned char* newPwd = (unsigned char*) sodium_malloc(PASSWORD_SIZE + 1); // on met + 1 pour avoir la place pour le \0
@@ -287,6 +297,8 @@ int main() {
                 getline(file, line); // get the first line which is the hash
                 getline(file, line); // get the second line which is the salt
 
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
                 cout << "Please enter the site name: " << endl;
                 cin >> siteName;
 
