@@ -94,7 +94,7 @@ int main() {
 
         // this part recover the salt from the file
         fstream file2;
-        file2.open("../db.txt");
+        file2.open(FILEPATH.c_str());
         string storedEncodedSalt;
         getline(file2, storedEncodedSalt); // first line is the hash
         getline(file2, storedEncodedSalt); // this line is the salt
