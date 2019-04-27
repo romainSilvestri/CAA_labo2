@@ -28,15 +28,14 @@ int main() {
     const string FILEPATH = "../db.txt";
     const string TMPPATH = "../tmp.txt";
 
-    bool first = true;
-
     FILE* db = fopen(FILEPATH.c_str(), "r+");
 
     if(db == NULL){
         db = fopen(FILEPATH.c_str(), "wr+");
 
-        char* pwd = (char*) sodium_malloc(PASSWORD_SIZE + 1); // on met + 1 pour avoir la place pour le \0
+        char* pwd = (char*) sodium_malloc(PASSWORD_SIZE + 1); // We put the +1 so we can store the \0
         if(pwd == NULL){
+            fclose(db);
             return EXIT_FAILURE;
         }
 
@@ -61,14 +60,16 @@ int main() {
         fputc('\n', db);
         sodium_free(pwd);
 
+        cout << "Files have been created, please relaunch the app to start using it." << endl;
+        fclose(db);
+        return EXIT_SUCCESS;
     }
 
     while(true){
 
-        if(!first){
-            db = fopen(FILEPATH.c_str(), "r+");
-        }
-        char* pwd = (char*) sodium_malloc(PASSWORD_SIZE + 1); // on met + 1 pour avoir la place pour le \0
+        db = fopen(FILEPATH.c_str(), "r+");
+
+        char* pwd = (char*) sodium_malloc(PASSWORD_SIZE + 1); // Add a +1 so we can store the \0
         if (pwd == NULL) {
             return EXIT_FAILURE;
         }
@@ -80,7 +81,7 @@ int main() {
         char storedHash[crypto_pwhash_STRBYTES];
         fgets(storedHash, crypto_pwhash_STRBYTES, db);
 
-        size_t len = strlen(storedHash);    // Cette partie enleve le \n à la fin de la ligne si il y en a plus qu'une
+        size_t len = strlen(storedHash);    // This part remove the \n at the end of the line if there is more than 1 line
         if(len > 0 && storedHash[len-1] == '\n'){
             storedHash[--len] = '\0';
         }
@@ -122,7 +123,6 @@ int main() {
 
         fclose(db);
         sodium_free(pwd);
-        first = false;
 
         while (true) { // We are unlocked
             fstream file;
@@ -132,7 +132,7 @@ int main() {
 
             cin.clear();
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            cout << "Please enter the command (lock, change, store or recover): " << endl;
+            cout << "Please enter the command (lock, change, store, recover or quit): " << endl;
 
             cin >> command; // todo: regarder pour mettre des fgets(variable, taille, stdin)
 
@@ -148,7 +148,7 @@ int main() {
 
                 newDB.open(TMPPATH.c_str(), ios::app);
 
-                char* newPwd = (char*) sodium_malloc(PASSWORD_SIZE + 1); // on met + 1 pour avoir la place pour le \0
+                char* newPwd = (char*) sodium_malloc(PASSWORD_SIZE + 1);
                 if (newPwd == NULL) {
                     cout << "Error allocating space" << endl;
                     break;
@@ -177,6 +177,7 @@ int main() {
                     sodium_free(newKey);
                     sodium_free(key);
                     fclose(db);
+                    file.close();
                     return EXIT_FAILURE;
                 }
 
@@ -186,6 +187,7 @@ int main() {
                     sodium_free(newKey);
                     sodium_free(key);
                     newDB.close();
+                    file.close();
                     return EXIT_FAILURE;
                 }
 
@@ -208,7 +210,12 @@ int main() {
                     unsigned char* recoverResult = (unsigned char*) sodium_malloc(PASSWORD_SIZE + 1);
                     if (recoverResult == NULL) {
                         cout << "Error allocating space" << endl;
-                        break;
+                        sodium_free(newKey);
+                        sodium_free(key);
+                        sodium_free(recoverResult);
+                        newDB.close();
+                        file.close();
+                        return EXIT_FAILURE;
                     }
 
                     string storedPwd = base64_decode(encodedStoredPwd);
@@ -222,6 +229,8 @@ int main() {
                         sodium_free(newKey);
                         sodium_free(key);
                         sodium_free(recoverResult);
+                        newDB.close();
+                        file.close();
                         return EXIT_FAILURE;
                     }
 
@@ -244,6 +253,7 @@ int main() {
                 sodium_free(key);
                 sodium_free(newKey);
                 file.close();
+                newDB.close();
                 break;
             }
 
@@ -259,7 +269,7 @@ int main() {
                 cin.ignore(numeric_limits<streamsize>::max(), '\n');
                 cout << "Please enter the password (min: 6 char): "  << endl;
 
-                unsigned char* newPwd = (unsigned char*) sodium_malloc(PASSWORD_SIZE + 1); // on met + 1 pour avoir la place pour le \0
+                unsigned char* newPwd = (unsigned char*) sodium_malloc(PASSWORD_SIZE + 1); 
                 if (newPwd == NULL) {
                     cout << "Error allocating space" << endl;
                     break;
@@ -340,6 +350,11 @@ int main() {
                     cout << "Not found" << endl;
                 }
                 continue;
+            }
+            if(command == "quit"){
+                sodium_free(key);
+                file.close();
+                return EXIT_SUCCESS;
             }
             file.close();
         }
