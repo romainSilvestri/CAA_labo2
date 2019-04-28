@@ -6,6 +6,9 @@
 #include "base64.h"
 
 #define PASSWORD_SIZE 1024
+#define S_(X)
+#define S(x) S_(X)
+
 
 using namespace std;
 
@@ -41,7 +44,7 @@ int main() {
 
         cout << "Enter a master password of, at most, " << PASSWORD_SIZE << " char:" << endl;
 
-        cin >> pwd;
+        scanf("%" S(PASSWORD_SIZE) "s", pwd);
 
         char hashed_pwd[crypto_pwhash_STRBYTES];
         if(crypto_pwhash_str(hashed_pwd, pwd, strlen(pwd), crypto_pwhash_OPSLIMIT_MIN, crypto_pwhash_MEMLIMIT_MIN)){ // TODO: remettre en sensitive
@@ -76,7 +79,7 @@ int main() {
 
         cout << "Please enter the master password" << endl;
 
-        cin >> pwd;
+        scanf("%" S(PASSWORD_SIZE) "s", pwd);
 
         char storedHash[crypto_pwhash_STRBYTES];
         fgets(storedHash, crypto_pwhash_STRBYTES, db);
@@ -134,7 +137,7 @@ int main() {
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
             cout << "Please enter the command (lock, change, store, recover or quit): " << endl;
 
-            cin >> command; // todo: regarder pour mettre des fgets(variable, taille, stdin)
+            cin >> command; // It's a C++ string so the size is dynamical hence we don't have to use scanf to be protected from buffer overflows attacks
 
             if(command == "lock"){
                 sodium_free(key);
@@ -157,7 +160,7 @@ int main() {
                 cin.clear();
                 cin.ignore(numeric_limits<streamsize>::max(), '\n');
                 cout << "Enter the new master password of, at most," << PASSWORD_SIZE << " char:" << endl;
-                cin >> newPwd;
+                scanf("%" S(PASSWORD_SIZE) "s", newPwd);
 
                 unsigned char newSalt[crypto_pwhash_SALTBYTES];
                 randombytes_buf(newSalt, sizeof newSalt);
@@ -237,7 +240,7 @@ int main() {
                     unsigned char nonce[crypto_secretbox_NONCEBYTES];
                     unsigned char cipher[crypto_secretbox_KEYBYTES + strlen((char*) recoverResult)];
 
-                    encode(cipher, recoverResult, (unsigned char*) nonce, newKey);
+                    encode(cipher, recoverResult, nonce, newKey);
 
                     string encodedNonce = base64_encode(nonce, sizeof(nonce));
                     string encodedCipher = base64_encode(cipher, sizeof(cipher));
@@ -263,25 +266,26 @@ int main() {
                 cin.clear();
                 cin.ignore(numeric_limits<streamsize>::max(), '\n');
                 cout << "Please enter the site name: " << endl;
-                cin >> siteName;
+                cin >> siteName; // String so cin safe
 
                 cin.clear();
                 cin.ignore(numeric_limits<streamsize>::max(), '\n');
                 cout << "Please enter the password (min: 6 char): "  << endl;
 
-                unsigned char* newPwd = (unsigned char*) sodium_malloc(PASSWORD_SIZE + 1); 
+                unsigned char* newPwd = (unsigned char*) sodium_malloc(PASSWORD_SIZE + 1);
                 if (newPwd == NULL) {
                     cout << "Error allocating space" << endl;
                     break;
                 }
-                cin >> newPwd;
+
+                scanf("%" S(PASSWORD_SIZE) "s", newPwd);
 
                 unsigned char nonce[crypto_secretbox_NONCEBYTES];
                 unsigned char cipher[crypto_secretbox_KEYBYTES + strlen((char*) newPwd)];
 
                 encode(cipher, newPwd, nonce, key);
 
-                // We decode it on the spot to see if the password was a supported one. The decode doesn't work with 6 or less char passwords and 8 char passwords.
+                // We decode it on the spot to see if the password was a supported one. The decode doesn't work with 6 or less char passwords.
                 if(decode(newPwd, cipher, nonce, key)){
                     cout << "Error, invalid password" << endl;
                     sodium_free(newPwd);
@@ -310,7 +314,7 @@ int main() {
                 cin.clear();
                 cin.ignore(numeric_limits<streamsize>::max(), '\n');
                 cout << "Please enter the site name: " << endl;
-                cin >> siteName;
+                cin >> siteName; // String so cin is safe
 
                 while(getline(file, line)){
                     string storedSite = line.substr(0, line.find(delimiter));
