@@ -47,7 +47,7 @@ int main() {
         scanf("%" S(PASSWORD_SIZE) "s", pwd);
 
         char hashed_pwd[crypto_pwhash_STRBYTES];
-        if(crypto_pwhash_str(hashed_pwd, pwd, strlen(pwd), crypto_pwhash_OPSLIMIT_MIN, crypto_pwhash_MEMLIMIT_MIN)){ // TODO: remettre en sensitive
+        if(crypto_pwhash_str(hashed_pwd, pwd, strlen(pwd), crypto_pwhash_OPSLIMIT_SENSITIVE, crypto_pwhash_MEMLIMIT_SENSITIVE)){
             sodium_free(pwd);
             fclose(db);
             return EXIT_FAILURE;
@@ -116,7 +116,7 @@ int main() {
             break;
         }
 
-        if(crypto_pwhash(key, crypto_secretbox_KEYBYTES, pwd, strlen(pwd), (unsigned char*) storedSalt.c_str(), crypto_pwhash_OPSLIMIT_MIN, crypto_pwhash_MEMLIMIT_MIN, crypto_pwhash_ALG_DEFAULT)) {
+        if(crypto_pwhash(key, crypto_secretbox_KEYBYTES, pwd, strlen(pwd), (unsigned char*) storedSalt.c_str(), crypto_pwhash_OPSLIMIT_INTERACTIVE, crypto_pwhash_MEMLIMIT_INTERACTIVE, crypto_pwhash_ALG_DEFAULT)) {
             cout << "Failure in KDF" << endl;
             sodium_free(pwd);
             sodium_free(key);
@@ -174,7 +174,7 @@ int main() {
                     break;
                 }
 
-                if(crypto_pwhash(newKey, crypto_secretbox_KEYBYTES, newPwd, strlen(newPwd), newSalt, crypto_pwhash_OPSLIMIT_MIN, crypto_pwhash_MEMLIMIT_MIN, crypto_pwhash_ALG_DEFAULT)) {
+                if(crypto_pwhash(newKey, crypto_secretbox_KEYBYTES, newPwd, strlen(newPwd), newSalt, crypto_pwhash_OPSLIMIT_INTERACTIVE, crypto_pwhash_MEMLIMIT_INTERACTIVE, crypto_pwhash_ALG_DEFAULT)) {
                     cout << "Failure in KDF" << endl;
                     sodium_free(newPwd);
                     sodium_free(newKey);
@@ -185,7 +185,7 @@ int main() {
                 }
 
                 char newHashedPwd[crypto_pwhash_STRBYTES];
-                if(crypto_pwhash_str(newHashedPwd, newPwd, strlen(newPwd), crypto_pwhash_OPSLIMIT_MIN, crypto_pwhash_MEMLIMIT_MIN)){ // TODO: remettre en sensitive
+                if(crypto_pwhash_str(newHashedPwd, newPwd, strlen(newPwd), crypto_pwhash_OPSLIMIT_SENSITIVE, crypto_pwhash_MEMLIMIT_SENSITIVE)){
                     sodium_free(newPwd);
                     sodium_free(newKey);
                     sodium_free(key);
