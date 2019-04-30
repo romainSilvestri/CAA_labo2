@@ -21,6 +21,7 @@ Les algorithmes utilisés sont XSalsa20 pour le chiffrement et Poly1305 pour l'a
 Pour le stockage du nonce, du cipher et du sel, les données sont formattées en base64 afin de pouvoir les écrire dans le fichier.
 
 ## Guide d'utilisation
+Pour lancer le manager, il faut exécuter le fichier a.out.
 Lors du lancement initial du manager, un master password est demandé. Une fois celui-ci fournit, la base de données est créée et le programme se ferme.  
 En relançant le manager et en fournissant le mot de passe défini ci-dessus, on accède au manager dans sa version "unlocked". Dans cet état, on peut rentrer les commandes suivantes :
 - ```lock```: fais retourner le manager dans son état "locked" de façon propre en nettoyant la mémoire. Pour pouvoir l'utiliser à nouveau, il faut fournir le master password.
@@ -38,7 +39,7 @@ Il faudrait empêcher l'arrêt brutal du manager par l'utilisateur en intercepta
 Ce comportement a été "camouflé" en forçant la sortie du programme et le redémarrage de celui-ci, mais ça reste néanmoins un bug dont l'origine n'est pas connue.
 - Lorsqu'un changement de master password est effectué, les mots de passe sont chiffrés de façon correcte (aucune erreur n'est levée), mais un problème survient de temps en temps avec le dernier de la liste. En effet, il n'est pas possible par la suite de déchiffrer le mot de passe stocké. La fonction de déchiffrement lève une exception. Ceci n'arrive qu'avec la dernière ligne du fichier, quel que soit le nombre de lignes que celui-ci contient.  
 L'origine de ce comportement non défini n'a pas été trouvée. La présence ou non de ce bug semble être définie lors du lancement du manager (lors de certains lancements, ce problème arrive et lors d'autres, il n'est pas présent).
-- Lors du stockage d'un mot de passe, il arrive que certains mots de passe valables ne soient pas acceptés. Relancer le manager permet de régler ce problème.  
+- Lors du stockage d'un mot de passe, il arrive que certains mots de passe valables ne soient pas acceptés. Effectuer le *store* à nouveau permet de le stocker.  
 L'origine de ce comportement non défini n'a pas été trouvée.
 
 </div>
