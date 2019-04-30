@@ -21,7 +21,7 @@ Les algorithmes utilisés sont XSalsa20 pour le chiffrement et Poly1305 pour l'a
 Pour le stockage du nonce, du cipher et du sel, les données sont formattées en base64 afin de pouvoir les écrire dans le fichier.
 
 ## Guide d'utilisation
-Pour lancer le manager, il faut exécuter le fichier a.out.
+Pour lancer le manager, il faut compiler le code à l'aide de la commande ```g++ main.cpp base64.cpp -lsodium``` puis lancer la commande ```./a.out```.  
 Lors du lancement initial du manager, un master password est demandé. Une fois celui-ci fournit, la base de données est créée et le programme se ferme.  
 En relançant le manager et en fournissant le mot de passe défini ci-dessus, on accède au manager dans sa version "unlocked". Dans cet état, on peut rentrer les commandes suivantes :
 - ```lock```: fais retourner le manager dans son état "locked" de façon propre en nettoyant la mémoire. Pour pouvoir l'utiliser à nouveau, il faut fournir le master password.
