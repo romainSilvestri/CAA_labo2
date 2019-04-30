@@ -107,7 +107,7 @@ int main() {
         file2.close();
 
         string storedSalt = base64_decode(storedEncodedSalt);
-        
+
         unsigned char* key = (unsigned char*) sodium_malloc(crypto_secretbox_KEYBYTES);
         if (key == NULL) {
             cout << "Error allocating space" << endl;
